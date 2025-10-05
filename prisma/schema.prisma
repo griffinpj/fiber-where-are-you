@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,21 +8,21 @@ datasource db {
 }
 
 model FiberProvider {
-  id                                String   @id @default(cuid())
-  frn                              String   
-  providerId                       String   @map("provider_id")
-  brandName                        String   @map("brand_name")
-  locationId                       String   @map("location_id")
-  technology                       Int      
-  maxAdvertisedDownloadSpeed       Int      @map("max_advertised_download_speed")
-  maxAdvertisedUploadSpeed         Int      @map("max_advertised_upload_speed")
-  lowLatency                       Int      @map("low_latency")
-  businessResidentialCode          String   @map("business_residential_code")
-  stateUsps                        String   @map("state_usps")
-  blockGeoid                       String   @map("block_geoid")
-  h3Res8Id                         String   @map("h3_res8_id")
-  createdAt                        DateTime @default(now()) @map("created_at")
-  updatedAt                        DateTime @updatedAt @map("updated_at")
+  id                         String   @id @default(cuid())
+  frn                        String
+  providerId                 String   @map("provider_id")
+  brandName                  String   @map("brand_name")
+  locationId                 String   @map("location_id")
+  technology                 Int
+  maxAdvertisedDownloadSpeed Int      @map("max_advertised_download_speed")
+  maxAdvertisedUploadSpeed   Int      @map("max_advertised_upload_speed")
+  lowLatency                 Int      @map("low_latency")
+  businessResidentialCode    String   @map("business_residential_code")
+  stateUsps                  String   @map("state_usps")
+  blockGeoid                 String   @map("block_geoid")
+  h3Res8Id                   String   @map("h3_res8_id")
+  createdAt                  DateTime @default(now()) @map("created_at")
+  updatedAt                  DateTime @updatedAt @map("updated_at")
 
   @@index([blockGeoid])
   @@index([brandName])
