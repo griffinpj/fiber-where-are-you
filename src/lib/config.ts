@@ -4,7 +4,6 @@ interface Config {
   };
   api: {
     geocodingKey?: string;
-    censusKey?: string;
   };
   app: {
     url: string;
@@ -30,7 +29,6 @@ export const config: Config = {
   },
   api: {
     geocodingKey: getOptionalEnvVar('GEOCODING_API_KEY'),
-    censusKey: getOptionalEnvVar('CENSUS_API_KEY'),
   },
   app: {
     url: getEnvVar('NEXTAUTH_URL', 'http://localhost:3000'),

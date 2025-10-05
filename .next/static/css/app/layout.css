@@ -958,6 +958,9 @@ video {
 .bg-muted {
   background-color: hsl(var(--muted));
 }
+.bg-muted\/50 {
+  background-color: hsl(var(--muted) / 0.5);
+}
 .bg-popover {
   background-color: hsl(var(--popover));
 }
@@ -969,9 +972,6 @@ video {
 }
 .bg-transparent {
   background-color: transparent;
-}
-.bg-muted\/50 {
-  background-color: hsl(var(--muted) / 0.5);
 }
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));

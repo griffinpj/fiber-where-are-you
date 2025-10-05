@@ -1,5 +1,14 @@
 import { config } from '@/lib/config';
 
+interface GooglePrediction {
+  description: string;
+  place_id: string;
+}
+
+interface MapboxFeature {
+  place_name: string;
+}
+
 export interface AddressSuggestion {
   formattedAddress: string;
   placeId?: string;
@@ -9,11 +18,10 @@ export interface AddressSuggestion {
     state?: string;
     zipCode?: string;
   };
-  source: 'census' | 'google' | 'mapbox';
+  source: 'google' | 'mapbox';
 }
 
 export class AutocompleteService {
-  private static readonly CENSUS_SUGGEST_URL = 'https://geocoding.geo.census.gov/geocoder/locations/suggest';
   private static readonly GOOGLE_PLACES_URL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
   private static readonly MAPBOX_SUGGEST_URL = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
@@ -26,7 +34,6 @@ export class AutocompleteService {
 
     // Try multiple services in parallel
     const promises = [
-      this.getCensusSuggestions(query, limit),
       this.getGoogleSuggestions(query, limit),
       this.getMapboxSuggestions(query, limit),
       this.getLocalSuggestions(query, limit), // Add fallback suggestions
@@ -45,31 +52,6 @@ export class AutocompleteService {
     return uniqueSuggestions.slice(0, limit);
   }
 
-  private static async getCensusSuggestions(query: string, limit: number): Promise<AddressSuggestion[]> {
-    try {
-      const url = `${this.CENSUS_SUGGEST_URL}?text=${encodeURIComponent(query)}&maxResults=${limit}`;
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error('Census API request failed');
-      }
-
-      const data = await response.json();
-      
-      if (!data.suggestions) {
-        return [];
-      }
-
-      return data.suggestions.map((suggestion: any) => ({
-        formattedAddress: suggestion.text,
-        components: this.parseAddress(suggestion.text),
-        source: 'census' as const,
-      }));
-    } catch (error) {
-      console.warn('Census autocomplete failed:', error);
-      return [];
-    }
-  }
 
   private static async getGoogleSuggestions(query: string, limit: number): Promise<AddressSuggestion[]> {
     const apiKey = config.api.geocodingKey;
@@ -91,7 +73,7 @@ export class AutocompleteService {
         return [];
       }
 
-      return data.predictions.slice(0, limit).map((prediction: any) => ({
+      return data.predictions.slice(0, limit).map((prediction: GooglePrediction) => ({
         formattedAddress: prediction.description,
         placeId: prediction.place_id,
         components: this.parseAddress(prediction.description),
@@ -123,7 +105,7 @@ export class AutocompleteService {
         return [];
       }
 
-      return data.features.map((feature: any) => ({
+      return data.features.map((feature: MapboxFeature) => ({
         formattedAddress: feature.place_name,
         components: this.parseAddress(feature.place_name),
         source: 'mapbox' as const,
@@ -185,17 +167,17 @@ export class AutocompleteService {
         {
           formattedAddress: '123 Main St, Seattle, WA 98101',
           components: { street: '123 Main St', city: 'Seattle', state: 'WA', zipCode: '98101' },
-          source: 'census',
+          source: 'google',
         },
         {
           formattedAddress: '456 Broadway Ave, Portland, OR 97201',
           components: { street: '456 Broadway Ave', city: 'Portland', state: 'OR', zipCode: '97201' },
-          source: 'census',
+          source: 'google',
         },
         {
           formattedAddress: '789 Pine St, San Francisco, CA 94102',
           components: { street: '789 Pine St', city: 'San Francisco', state: 'CA', zipCode: '94102' },
-          source: 'census',
+          source: 'google',
         },
       ];
 

@@ -28,7 +28,7 @@ export function AddressAutocomplete({
   const [open, setOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [justSelected, setJustSelected] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchSuggestions = useCallback(async (searchQuery: string) => {
@@ -139,8 +139,6 @@ export function AddressAutocomplete({
         return '🅖';
       case 'mapbox':
         return '🗺️';
-      case 'census':
-        return '🏛️';
       default:
         return '📍';
     }
