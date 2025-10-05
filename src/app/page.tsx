@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { SearchForm } from '@/components/search-form';
 import { ProviderResults } from '@/components/provider-results';
 import { ErrorMessage } from '@/components/error-message';
+import { ProviderSearchResult } from '@/types';
 
 type SearchState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -13,7 +14,7 @@ interface SearchResults {
     city: string;
     state: string;
   };
-  providers: any[];
+  providers: ProviderSearchResult[];
   stats: {
     totalProviders: number;
     averageDownloadSpeed: number;

@@ -29,10 +29,12 @@ A Next.js application that helps users find fiber internet providers available i
 
 1. **Clone and install dependencies**:
    ```bash
+   git clone <repository-url>
+   cd fiber-where-are-you
    npm install
    ```
 
-2. **Start PostgreSQL database**:
+2. **Start PostgreSQL database with Docker**:
    ```bash
    docker-compose up -d
    ```
@@ -40,20 +42,24 @@ A Next.js application that helps users find fiber internet providers available i
 3. **Set up environment variables**:
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
+   # Edit .env with your configuration if needed
    ```
 
-4. **Generate Prisma client and apply database schema**:
+4. **Run database migrations**:
    ```bash
+   npm run db:migrate
    npm run db:generate
-   npm run db:push
    ```
 
 5. **Seed the database with FCC data**:
    ```bash
    npm run db:seed
    ```
-   *Note: This will process the CSV file in the `data/` directory and may take several minutes depending on file size.*
+   *Note: This will process the CSV file in the `data/` directory and may take several minutes depending on file size. The seeding process will:*
+   - *Parse FCC broadband data from CSV format*
+   - *Insert provider records into the database*
+   - *Create indexes for optimal query performance*
+   - *Display progress updates during processing*
 
 6. **Start the development server**:
    ```bash
@@ -61,6 +67,16 @@ A Next.js application that helps users find fiber internet providers available i
    ```
 
    Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Alternative Setup (Production-like)
+
+For a production-like setup using migrations:
+
+1. **Deploy migrations** (instead of step 4 above):
+   ```bash
+   npm run db:migrate:deploy
+   npm run db:generate
+   ```
 
 ## API Endpoints
 
@@ -172,10 +188,34 @@ src/
 
 - **Linting**: `npm run lint`
 - **Type checking**: `npx tsc --noEmit`
-- **Database reset**: `docker-compose down -v && docker-compose up -d`
-- **Re-seed data**: `npm run db:seed`
+- **Database management**:
+  - **View database**: `npm run db:studio`
+  - **Reset database**: `npm run db:migrate:reset`
+  - **Re-seed data**: `npm run db:seed`
+  - **Full reset**: `docker-compose down -v && docker-compose up -d && npm run db:migrate && npm run db:generate && npm run db:seed`
 
-## Data Source
+## Docker Commands
+
+- **Start database**: `docker-compose up -d`
+- **Stop database**: `docker-compose down`
+- **Reset database with volumes**: `docker-compose down -v && docker-compose up -d`
+- **View logs**: `docker-compose logs postgres`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:migrate` - Run database migrations (development)
+- `npm run db:migrate:deploy` - Deploy migrations (production)
+- `npm run db:migrate:reset` - Reset and re-run all migrations
+- `npm run db:push` - Push schema changes directly (development only)
+- `npm run db:studio` - Open Prisma Studio
+- `npm run db:seed` - Seed database with FCC data
+
+## Data Source & Seeding Process
 
 This application uses FCC Form 477 broadband availability data. The CSV file should contain the following columns:
 
@@ -183,6 +223,23 @@ This application uses FCC Form 477 broadband availability data. The CSV file sho
 - `technology`, `max_advertised_download_speed`, `max_advertised_upload_speed`
 - `low_latency`, `business_residential_code`, `state_usps`
 - `block_geoid`, `h3_res8_id`
+
+### Seeding Process Details
+
+The `npm run db:seed` command executes `scripts/seed.ts` which:
+
+1. **Reads CSV data** from the `data/` directory
+2. **Processes records in batches** for memory efficiency
+3. **Filters for fiber technology** (technology = 50)
+4. **Validates data integrity** before insertion
+5. **Creates database indexes** for optimal query performance
+6. **Reports progress** with status updates
+
+**Performance Notes:**
+- Large datasets (1M+ records) may take 10-30 minutes to process
+- The process uses batch inserts for optimal performance
+- Memory usage is optimized through streaming CSV parsing
+- Database constraints ensure data integrity
 
 ## Address Autocomplete
 

@@ -28,8 +28,21 @@ export function AddressAutocomplete({
   const [open, setOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [justSelected, setJustSelected] = useState(false);
+  const [csrfToken, setCsrfToken] = useState<string>('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const fetchCSRFToken = useCallback(async () => {
+    try {
+      const response = await fetch('/api/csrf-token');
+      if (response.ok) {
+        const data = await response.json();
+        setCsrfToken(data.csrfToken);
+      }
+    } catch (error) {
+      console.error('Failed to fetch CSRF token:', error);
+    }
+  }, []);
 
   const fetchSuggestions = useCallback(async (searchQuery: string) => {
     if (searchQuery.length < 3) {
@@ -38,14 +51,28 @@ export function AddressAutocomplete({
       return;
     }
 
+    // Ensure we have a CSRF token before making the request
+    if (!csrfToken) {
+      await fetchCSRFToken();
+      return; // Will retry on next call when token is available
+    }
+
     setIsLoading(true);
     setHasSearched(true);
     
     try {
-      const response = await fetch(`/api/autocomplete?q=${encodeURIComponent(searchQuery)}&limit=8`);
+      const response = await fetch(`/api/autocomplete?q=${encodeURIComponent(searchQuery)}&limit=8`, {
+        headers: {
+          'x-csrf-token': csrfToken,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setSuggestions(data.suggestions || []);
+      } else if (response.status === 403) {
+        // CSRF token might be invalid, refresh it
+        await fetchCSRFToken();
+        setSuggestions([]);
       } else {
         setSuggestions([]);
       }
@@ -55,7 +82,7 @@ export function AddressAutocomplete({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [csrfToken, fetchCSRFToken]);
 
   const debouncedFetch = useCallback((searchQuery: string) => {
     if (timeoutRef.current) {
@@ -66,6 +93,11 @@ export function AddressAutocomplete({
       fetchSuggestions(searchQuery);
     }, 300);
   }, [fetchSuggestions]);
+
+  // Fetch CSRF token on component mount
+  useEffect(() => {
+    fetchCSRFToken();
+  }, [fetchCSRFToken]);
 
   useEffect(() => {
     if (query && query.length >= 3) {

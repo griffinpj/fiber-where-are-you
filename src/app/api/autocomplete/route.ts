@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AutocompleteService } from '@/lib/services/autocomplete';
+import { validateCSRFToken } from '@/lib/csrf';
 
 export async function GET(request: NextRequest) {
+  // Validate CSRF token for autocomplete requests
+  if (!(await validateCSRFToken(request))) {
+    return NextResponse.json(
+      { error: 'Invalid or missing CSRF token' },
+      { status: 403 }
+    );
+  }
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q');

@@ -32,7 +32,7 @@ export class ProviderService {
       });
 
       // Convert grouped providers to search results with speed ranges
-      return Array.from(groupedProviders.entries()).map(([key, providerGroup]) => {
+      return Array.from(groupedProviders.entries()).map(([, providerGroup]) => {
         const representative = providerGroup[0]; // Use first provider as representative
         
         // Calculate speed ranges

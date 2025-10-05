@@ -11,6 +11,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
+    "/api/csrf-token/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/csrf-token/route.js"
+    ],
     "/api/autocomplete/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
