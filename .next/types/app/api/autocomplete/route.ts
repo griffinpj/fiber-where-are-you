@@ -1,8 +1,8 @@
-// File: /Users/griffin/dev/fiber-where-are-you/src/app/api/autocomplete/route.ts
-import * as entry from '../../../../../src/app/api/autocomplete/route.js'
+// File: /Users/griffin/dev/fiber-where-are-you/app/api/autocomplete/route.ts
+import * as entry from '../../../../../app/api/autocomplete/route.js'
 import type { NextRequest } from 'next/server.js'
 
-type TEntry = typeof import('../../../../../src/app/api/autocomplete/route.js')
+type TEntry = typeof import('../../../../../app/api/autocomplete/route.js')
 
 type SegmentParams<T extends Object = any> = T extends Record<string, any>
   ? { [K in keyof T]: T[K] extends string ? string | string[] | undefined : never }

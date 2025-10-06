@@ -1,8 +1,8 @@
-// File: /Users/griffin/dev/fiber-where-are-you/src/app/api/csrf-token/route.ts
-import * as entry from '../../../../../src/app/api/csrf-token/route.js'
+// File: /Users/griffin/dev/fiber-where-are-you/app/api/csrf-token/route.ts
+import * as entry from '../../../../../app/api/csrf-token/route.js'
 import type { NextRequest } from 'next/server.js'
 
-type TEntry = typeof import('../../../../../src/app/api/csrf-token/route.js')
+type TEntry = typeof import('../../../../../app/api/csrf-token/route.js')
 
 type SegmentParams<T extends Object = any> = T extends Record<string, any>
   ? { [K in keyof T]: T[K] extends string ? string | string[] | undefined : never }
